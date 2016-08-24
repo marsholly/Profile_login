@@ -16,7 +16,6 @@ router.post('/register', (req, res) => {
 });
 
 
-
 router.post('/login', (req, res) => {
   //  req.body ---> { username: 'bob', password: 'secure' }
   //  'login attempt'
@@ -27,11 +26,31 @@ router.post('/login', (req, res) => {
 
 
   User.authenticate(req.body, (err, token) => {
-    res.status(err ? 400 : 200).send(err || token);
+    if(err) {
+      res.status(400).send(err);
+    } else {
+      res.cookie('authtoken', token).send();
+    }
   });
 })
 
+router.get('/profile', User.authMiddleware, (req, res) => {
+
+  // req.user --> logged in user's document
+
+  console.log('req.user:', req.user);
+  res.send(req.user);
+});
+
+router.post('/logout', (req, res) => {
+  res.clearCookie('authtoken').send();
+})
 
 
+// router.put('/profile', User.authMiddleware, (req, res) => {
+//   User.findByIdAndUpdate(req.user._id, {$set: req.body}, {new: true}, (err, user) => {
+
+//   })
+// })
 
 module.exports = router;

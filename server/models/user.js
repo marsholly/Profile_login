@@ -32,11 +32,11 @@ userSchema.statics.authenticate = function(userObj, cb) {
 
   this.findOne({ username }, (err, user) => {
     if(err || !user) {
-      return cb(err || {error: "Username not found."});
+      return cb(err || {error: 'Login failed.  Username or password incorrect.'});
     }
 
     if(user.password !== password) {
-      return cb({error: 'Password not correct.'});
+      return cb({error: 'Login failed.  Username or password incorrect.'});
     }
 
     let payload = {
@@ -46,6 +46,37 @@ userSchema.statics.authenticate = function(userObj, cb) {
     jwt.sign(payload, JWT_SECRET, {}, cb);
   });
 };
+
+
+
+userSchema.statics.authMiddleware = function(req, res, next) {
+
+//   // 1. read token from cookie
+//   // 2. verify the token, decode the payload
+//   // 3. find the user by id
+
+//   // if token is good, we call next()
+//   // if the token is bad or missing, we call res.status(401).send() 
+//   //   and we end the request
+
+
+  let token = req.cookies.authtoken;
+
+  jwt.verify(token, JWT_SECRET, (err, payload) => {
+    if(err) return res.status(401).send(err);
+
+    mongoose.model('User')
+      .findById(payload._id)
+      .select('-password')
+      .exec((err, user) => {
+        if(err) return res.status(400).send(err);
+        if(!user) return res.status(401).send({error: 'User not found.'});
+
+        req.user = user;
+        next();
+      });
+  });
+}
 
 const User = mongoose.model('User', userSchema);
 

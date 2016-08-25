@@ -32,25 +32,19 @@ userSchema.statics.register = function(userObj, cb) {
 };
 
 userSchema.statics.authenticate = function(userObj, cb) {
-  //  userObj --> 'login attempt'
-
-  //  1.  check if user exists, and password is correct
-  //  2.  create a token (JWT)
-  //  3.  callback with token
-
   let { username, password } = userObj;
 
-  this.findOne({ username }, (err, user) => {
-    if(err || !user) {
+  this.findOne({ username }, (err, dbUser) => {
+    if(err || !dbUser) {
       return cb(err || {error: 'Login failed.  Username or password incorrect.'});
     }
 
-    bcrypt.compare(password, user.password, (err, isGood) => {
+    bcrypt.compare(password, dbUser.password, (err, isGood) => {
       if(err) return cb(err);
       if(!isGood) return cb({error: 'Login failed.  Username or password incorrect.'});
 
       let payload = {
-        _id: user._id
+        _id: dbUser._id
       }
 
       jwt.sign(payload, JWT_SECRET, {}, cb);
@@ -59,16 +53,6 @@ userSchema.statics.authenticate = function(userObj, cb) {
 };
 
 userSchema.statics.authMiddleware = function(req, res, next) {
-
-//   // 1. read token from cookie
-//   // 2. verify the token, decode the payload
-//   // 3. find the user by id
-
-//   // if token is good, we call next()
-//   // if the token is bad or missing, we call res.status(401).send() 
-//   //   and we end the request
-
-
   let token = req.cookies.authtoken;
 
   jwt.verify(token, JWT_SECRET, (err, payload) => {
@@ -85,7 +69,7 @@ userSchema.statics.authMiddleware = function(req, res, next) {
         next();
       });
   });
-}
+};
 
 const User = mongoose.model('User', userSchema);
 

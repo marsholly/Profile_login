@@ -19,7 +19,7 @@ require('mongoose').connect(MONGO_URI, err => {
 const app = express();
 
 if(process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../build')))
+  app.use(express.static(path.join(__dirname, '../build')));
 } else {
   // WEBPACK CONFIG
   const webpack = require('webpack');
@@ -31,8 +31,7 @@ if(process.env.NODE_ENV === 'production') {
     publicPath: webpackConfig.output.publicPath
   }));
 
-  app.use(require('webpack-hot-middleware')(compiler));  
-
+  app.use(require('webpack-hot-middleware')(compiler));
 }
 
 // GENERAL MIDDLEWARE

@@ -2,8 +2,9 @@
 // it should be kept as an env variable
 const JWT_SECRET = 'q3w4de5frg6t7hyj8u9ki0u98y7t6r5e';
 
-const mongoose = require('mongoose');
+const bcrypt = require('bcrypt-node');
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
@@ -15,8 +16,17 @@ userSchema.statics.register = function(userObj, cb) {
     if(err) return cb(err);
     if(dbUser) return cb({error: 'Username already taken.'});
 
-    this.create(userObj, (err, newUser) => {
-      cb(err);
+    bcrypt.genSalt(11, (err, salt) => {
+      if(err) return cb(err);
+      bcrypt.hash(userObj.password, salt, null, (err, hash) => {
+        if(err) return cb(err);
+
+        userObj.password = hash;
+
+        this.create(userObj, (err, newUser) => {
+          cb(err);
+        });
+      });
     });
   });
 };
@@ -35,19 +45,18 @@ userSchema.statics.authenticate = function(userObj, cb) {
       return cb(err || {error: 'Login failed.  Username or password incorrect.'});
     }
 
-    if(user.password !== password) {
-      return cb({error: 'Login failed.  Username or password incorrect.'});
-    }
+    bcrypt.compare(password, user.password, (err, isGood) => {
+      if(err) return cb(err);
+      if(!isGood) return cb({error: 'Login failed.  Username or password incorrect.'});
 
-    let payload = {
-      _id: user._id
-    }
+      let payload = {
+        _id: user._id
+      }
 
-    jwt.sign(payload, JWT_SECRET, {}, cb);
+      jwt.sign(payload, JWT_SECRET, {}, cb);
+    })
   });
 };
-
-
 
 userSchema.statics.authMiddleware = function(req, res, next) {
 

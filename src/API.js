@@ -14,7 +14,10 @@ const API = {
 
   login(user) {
     axios.post('/api/users/login', user)
-      .then(UserActions.getProfile)
+      .then(() => {
+        UserActions.getProfile()
+        RouteActions.route('/');
+      })
       .catch(console.error)
   },
 

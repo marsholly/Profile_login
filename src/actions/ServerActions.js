@@ -7,8 +7,12 @@ const ServerActions = {
       type: Constants.RECEIVE_PROFILE,
       profile
     })
+  },
+  removeProfile(profile) {
+    AppDispatcher.dispatch({
+      type: Constants.REMOVE_PROFILE
+    })
   }
-
 };
 
 export default ServerActions;

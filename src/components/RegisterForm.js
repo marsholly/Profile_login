@@ -30,7 +30,7 @@ export default class RegisterForm extends Component {
     if(password1 !== password2) {
       this.setState({
         password1: '',
-        password2: ''        
+        password2: ''
       })
       return alert('Passwords do not match, try again.');
     }
@@ -51,7 +51,14 @@ export default class RegisterForm extends Component {
         <form onSubmit={this._submit}>
           <div className="form-group">
             <label>Username</label>
-            <input type="text" className="form-control" placeholder="Username" required value={username} data-statekey='username' onChange={this._onInputChange}/>
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Username"
+              required
+              value={username}
+              data-statekey='username'
+              onChange={this._onInputChange}/>
           </div>
           <div className="form-group">
             <label>Password</label>

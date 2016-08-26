@@ -10,9 +10,9 @@ const ServerActions = {
   },
   removeProfile(profile) {
     AppDispatcher.dispatch({
-      type: Constants.REMOVE_PROFILE
+      type: Constants.REMOVE_PROFILE,
     })
-  }
+  },
 };
 
 export default ServerActions;

@@ -4,7 +4,8 @@ const UserActions = {
   register: API.register,
   login: API.login,
   getProfile: API.getProfile,
-  logout: API.logout
+  logout: API.logout,
+  editProf: API.editProf
 };
 
 export default UserActions;
